@@ -1,4 +1,4 @@
-# Entomological Focus Stacking Dataset
+# Entomological Focus Stacking 
 
 This repository hosts data and resources supporting the development of a deep learning model for improved focus stacking in entomological 3D reconstruction. The dataset, designed to facilitate high-resolution, multi-focus image processing, is specifically curated for applications in the field of entomology. This provides an overview of the dataset, related resources, and a link to the thesis detailing the model development and performance evaluation.
 
