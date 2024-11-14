@@ -29,12 +29,6 @@ def main(config):
     tasks_per_node=tasks_per_node,
     cpus_per_task=40 // tasks_per_node,
     stderr_to_stdout=True,
-    slurm_account=config.cluster.account,
-    slurm_job_name=f'{config.project.train_dir[-4:]}_{config.project.mode}',
-    slurm_partition=config.cluster.partition,
-    slurm_qos=config.cluster.qos,
-    slurm_constraint=config.cluster.constraint,
-    slurm_signal_delay_s=0,
     timeout_min=config.cluster.timeout,
   )
 
