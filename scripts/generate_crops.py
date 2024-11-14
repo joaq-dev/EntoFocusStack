@@ -145,15 +145,13 @@ if __name__ == '__main__':
     bursts_list = list(bursts_list)
 
     executor = submitit.AutoExecutor(
-      folder='./', cluster='slurm')
+      folder='./', cluster='local')
     executor.update_parameters(
       stderr_to_stdout=True,
-      slurm_gpus_per_node=4,
-      slurm_nodes=1,
-      slurm_job_name=f'crops',
-      slurm_signal_delay_s=0,
-      slurm_timeout_min=15,
-      slurm_exclusive=True
+      gpus_per_node=2,
+      nodes=1,
+      tasks_per_node=1,
+      timeout_min=15,   #Considering an increase to 30 instead
     )
 
     generate = GenerateCrops(crop_size)
