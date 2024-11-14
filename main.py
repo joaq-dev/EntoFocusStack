@@ -26,8 +26,8 @@ def main(config):
   executor.update_parameters(
     gpus_per_node=config.cluster.ngpus,
     nodes=config.cluster.nnodes,
-    tasks_per_node=tasks_per_node,
-    cpus_per_task=40 // tasks_per_node,
+    tasks_per_node=tasks_per_node, # expected to be two since ngpus =2
+    cpus_per_task=40 // tasks_per_node, # 40  Shall depends on how many cpu cores aavailable in the local machine
     stderr_to_stdout=True,
     timeout_min=config.cluster.timeout,
   )
