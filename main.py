@@ -68,7 +68,7 @@ if __name__ == '__main__':
   # cluster settings
   parser_cluster = parser.add_argument_group("cluster", "Cluster configurations")
   parser_cluster.add_argument("--account", type=str, help="Account to use for slurm.")
-  parser_cluster.add_argument("--ngpus", type=int, default=4, help="Number of GPUs to use.")
+  parser_cluster.add_argument("--ngpus", type=int, default=2, help="Number of GPUs to use.")
   parser_cluster.add_argument("--nnodes", type=int, default=1, help="Number of nodes.")
   parser_cluster.add_argument("--timeout", type=int, default=1200, help="Time of the Slurm job in minutes for training.")
   parser_cluster.add_argument("--partition", type=str, help="Partition to use for Slurm.")
