@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # First evaluation
-python main.py --mode eval --data_dir "data/focus_stack_dataset/dataset" --train_dir "//timestamped train folder" --dataset_lens firstgroup
+CUDA_VISIBLE_DEVICES=0,6 python main.py --mode eval --local --data_dir "data/focus_stack_dataset/dataset" --train_dir "//timestamped train folder" --dataset_lens firstgroup
 
 # Second evaluation
-python main.py --mode eval --data_dir "data/focus_stack_dataset/dataset" --train_dir "//timestamped train folder" --dataset_lens secondgroup
+CUDA_VISIBLE_DEVICES=0,6 python main.py --mode eval --local --data_dir "data/focus_stack_dataset/dataset" --train_dir "//timestamped train folder" --dataset_lens secondgroup
 
