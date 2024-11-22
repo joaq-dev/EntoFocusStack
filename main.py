@@ -1,4 +1,3 @@
-
 import os
 import sys
 import shutil
@@ -117,7 +116,7 @@ if __name__ == '__main__':
   parser_eval.add_argument("--dataset_split", type=str, )
   parser_eval.add_argument("--dataset_lens", type=str, default='firstgroup',
                            choices=['firstgroup', 'secondgroup', ''])
-  parser_eval.add_argument("--prediction_", type=str, default="./imsave")
+  parser_eval.add_argument("--prediction_folder", type=str, default="./imsave")
   parser_eval.add_argument("--image_type", type=str, default='aligned', choices=['raw', 'jpg', 'aligned', '']) #change to jpg/aligned
   parser_eval.add_argument("--image_scaling", type=float, default=1)
   parser_eval.add_argument("--burst_name", type=str, default="all")
