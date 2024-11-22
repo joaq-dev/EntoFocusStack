@@ -33,9 +33,9 @@ classic_models = ['wavelets', 'laplacian']
 
 class Evaluator:
 
-  def __init__(self, config, submitit=True):
+  def __init__(self, config):
     self.config = config
-    self.submitit = submitit
+   
 
   def load_state(self, ckpt_path=None):
     if ckpt_path is None:

@@ -1,4 +1,3 @@
-
 import os
 import sys
 import shutil
@@ -9,55 +8,43 @@ from datetime import datetime
 from os import makedirs
 from os.path import join, exists, realpath, expandvars, basename
 
-import submitit
-from core.utils import Config
 
+from core.utils import Config
+# Add GPU selection logic to choose GPUs locally
+if config.cluster.gpus_to_use:
+    os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, config.cluster.gpus_to_use))
 
 def main(config):
 
-  # default: set tasks_per_node equal to number of gpus
-  tasks_per_node = config.cluster.ngpus
-  if config.cluster.single_node or config.project.mode == 'eval':
-    tasks_per_node = 1
-  cluster = 'slurm' if not config.cluster.local else 'local'
+ 
 
-  executor = submitit.AutoExecutor(
-    folder=config.project.train_dir, cluster=cluster)
-  executor.update_parameters(
-    gpus_per_node=config.cluster.ngpus,
-    nodes=config.cluster.nnodes,
-    tasks_per_node=tasks_per_node, # expected to be two since ngpus =2
-    cpus_per_task=40 // tasks_per_node, # 40  Shall depends on how many cpu cores aavailable in the local machine
-    stderr_to_stdout=True,
-    timeout_min=config.cluster.timeout,
-  )
 
-  if config.cluster.begin:
-    executor.update_parameters(
-      slurm_additional_parameters={'begin': config.cluster.begin},
-    )
 
-  if config.project.mode == 'train':
+if config.project.mode == 'train':
     from core.trainer import Trainer
     trainer = Trainer(config)
-    job = executor.submit(trainer)
-  elif config.project.mode == 'eval':
+    trainer()  # Directly call the training method
+
+elif config.project.mode == 'eval':
     from core.evaluate import Evaluator
     if config.eval.burst_name == 'all':
-      burst_path = glob.glob(join(config.eval.eval_data_dir, '*'))
-      burst_names = [x.split('/')[-1] for x in burst_path]
-      with executor.batch():
+        burst_path = glob.glob(join(config.eval.eval_data_dir, '*'))
+        burst_names = [x.split('/')[-1] for x in burst_path]
+        
+        # Iterate through each burst and run evaluation directly
         for burst_name in burst_names:
-          new_config = copy.deepcopy(config)
-          new_config.eval.burst_name = burst_name
-          evaluate = Evaluator(new_config)
-          job = executor.submit(evaluate)
+            new_config = copy.deepcopy(config)
+            new_config.eval.burst_name = burst_name  # Set the current burst to evaluate
+            evaluator = Evaluator(new_config)
+            evaluator()  # Directly call the evaluate method
     else:
-      evaluate = Evaluator(config)
-      job = executor.submit(evaluate)
+        # Evaluate a specific burst
+        evaluator = Evaluator(config)
+        evaluator()  # Directly call the evaluate method
 
-  folder = config.project.train_dir.split('/')[-1]
-  print(f"Submitted batch job {job.job_id} in folder {folder}")
+
+folder = config.project.train_dir.split('/')[-1]
+print(f"Training started in folder {folder}")
 
 
 
@@ -77,6 +64,8 @@ if __name__ == '__main__':
   parser_cluster.add_argument("--begin", type=str, default='', help="Set time to begin job")
   parser_cluster.add_argument("--local", action='store_true', help="Execute with local machine instead of slurm.")
   parser_cluster.add_argument("--debug", action="store_true", help="Activate debug mode.")
+  parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 4], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 4].")
+
   # default training is distributed (even on single node)
   # to force non-distributed training, activate single node
   parser_cluster.add_argument("--single-node", action='store_true', help="Force non-distributed training.")

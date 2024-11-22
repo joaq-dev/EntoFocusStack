@@ -7,7 +7,7 @@ import pprint
 import socket
 import logging
 import glob
-import submitit
+
 from os.path import join, exists
 
 from core import utils
@@ -81,12 +81,11 @@ class Trainer:
     self.train_dir = self.config.project.train_dir
     self.ngpus = self.config.cluster.ngpus
 
-    job_env = submitit.JobEnvironment()
-    self.rank = int(job_env.global_rank)
-    self.local_rank = int(job_env.local_rank)
-    self.num_nodes = int(job_env.num_nodes) 
-    self.num_tasks = int(job_env.num_tasks)
-    self.is_master = bool(self.rank == 0)
+    self.rank = int(os.environ.get("RANK", 0))
+    self.local_rank = int(os.environ.get("LOCAL_RANK", 0))
+    self.num_nodes = int(os.environ.get("WORLD_SIZE", 1)) // self.config.cluster.ngpus
+    self.num_tasks = int(os.environ.get("WORLD_SIZE", 1))
+    self.is_master = (self.rank == 0)
 
     # Setup logging
     utils.setup_logging(self.config.project, self.rank)
@@ -104,19 +103,13 @@ class Trainer:
       logging.info(f"Hostname: {socket.gethostname()}.")
 
     # ditributed settings
-    self.world_size = 1
-    self.is_distributed = False
-    if self.num_nodes > 1 or self.num_tasks > 1:
-      self.is_distributed = True
-      self.world_size = self.num_nodes * self.ngpus
-    if self.num_nodes > 1:
-      logging.info(
-        f"Distributed Training on {self.num_nodes} nodes")
-    elif self.num_nodes == 1 and self.num_tasks > 1:
-      logging.info(f"Single node Distributed Training with {self.num_tasks} tasks")
+    self.world_size = int(os.environ.get("WORLD_SIZE", 1))
+    self.is_distributed = self.world_size > 1
+    if self.is_distributed:
+    logging.info(f"Distributed Training with {self.world_size} processes")
     else:
-      assert self.num_nodes == 1 and self.num_tasks == 1
-      logging.info("Single node training.")
+    logging.info("Single node training.")
+
 
     if not self.is_distributed:
       self.batch_size = self.config.training.batch_size * self.ngpus
@@ -146,7 +139,7 @@ class Trainer:
     # setup distributed process if training is distributed 
     # and use DistributedDataParallel for distributed training
     if self.is_distributed:
-      utils.setup_distributed_training(self.world_size, self.rank)
+      torch.distributed.init_process_group(backend="nccl", rank=self.rank, world_size=self.world_size)
       self.model = DistributedDataParallel(
         self.model, device_ids=[self.local_rank], output_device=self.local_rank)
       if self.local_rank == 0:
@@ -219,6 +212,9 @@ class Trainer:
 
     self._save_ckpt(global_step, epoch_id, final=True)
     logging.info("Done training -- epoch limit reached.")
+    if self.is_distributed:
+    torch.distributed.destroy_process_group()
+
 
   def _print_approximated_train_time(self, start_time):
     total_steps = self.reader.n_train_files * self.config.training.epochs / self.global_batch_size
