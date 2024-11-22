@@ -143,7 +143,7 @@ def process_burst(burst_path, crop_size, device_id):
 if __name__ == '__main__':
 
     crop_size = 128
-    gpu_ids = [0, 1]  # Specify GPU indices here
+    gpu_ids = [0, 4]  # Specify GPU indices here GPU0, GPU4
     num_gpus = len(gpu_ids)
 
     for split in ['train', 'test']:
