@@ -65,7 +65,7 @@ if __name__ == '__main__':
   parser_cluster.add_argument("--begin", type=str, default='', help="Set time to begin job")
   parser_cluster.add_argument("--local", action='store_true', help="Execute with local machine instead of slurm.")
   parser_cluster.add_argument("--debug", action="store_true", help="Activate debug mode.")
-  parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 1], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 1].")
+  parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 4], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 4].")
 
   # default training is distributed (even on single node)
   # to force non-distributed training, activate single node
