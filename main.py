@@ -10,15 +10,11 @@ from os.path import join, exists, realpath, expandvars, basename
 
 
 from core.utils import Config
+
+def main(config):
 # Add GPU selection logic to choose GPUs locally
 if config.cluster.gpus_to_use:
     os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, config.cluster.gpus_to_use))
-
-def main(config):
-
- 
-
-
 
 if config.project.mode == 'train':
     from core.trainer import Trainer
