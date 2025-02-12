@@ -10,6 +10,7 @@ import pickle
 from os.path import join
 import cv2
 from multiprocessing import Pool
+import argparse
 
 def pickle_dump(file, path):
     """ Function to dump pickle object """
@@ -142,10 +143,15 @@ def process_burst(burst_path, crop_size, device_id):
 
 if __name__ == '__main__':
 
-    crop_size = 128
-    gpu_ids = [0, 4]  # Specify GPU indices here GPU0, GPU4
-    num_gpus = len(gpu_ids)
+    # Argument parser for GPU selection
+    parser = argparse.ArgumentParser(description="Generate crops from images using multiple GPUs")
+    parser.add_argument('--gpu_ids', type=str, default='0,4', help='Comma-separated list of GPU IDs (e.g., "0,1,2")')
+    args = parser.parse_args()
 
+    # Convert string input to list of integers
+    gpu_ids = list(map(int, args.gpu_ids.split(',')))
+    num_gpus = len(gpu_ids)
+    crop_size = 128
     for split in ['train', 'test']:
         df = pd.read_csv('dataset.csv', sep=";")
         df = df[df['set'] == split][['lens', 'photo']]
