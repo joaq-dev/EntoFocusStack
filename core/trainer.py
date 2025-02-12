@@ -81,9 +81,9 @@ class Trainer:
     self.train_dir = self.config.project.train_dir
     self.ngpus = self.config.cluster.ngpus
 
+    # Fetch Environment set up by torchrun
     self.rank = int(os.environ.get("RANK", 0))
     self.local_rank = int(os.environ.get("LOCAL_RANK", 0))
-    self.num_nodes = int(os.environ.get("WORLD_SIZE", 1)) // self.config.cluster.ngpus
     self.num_tasks = int(os.environ.get("WORLD_SIZE", 1))
     self.is_master = (self.rank == 0)
 
@@ -102,13 +102,13 @@ class Trainer:
       logging.info(f"NCCL Version {torch.cuda.nccl.version()}")
       logging.info(f"Hostname: {socket.gethostname()}.")
 
-    # ditributed settings
+    # distributed settings
     self.world_size = int(os.environ.get("WORLD_SIZE", 1))
     self.is_distributed = self.world_size > 1
     if self.is_distributed:
-    logging.info(f"Distributed Training with {self.world_size} processes")
+      logging.info(f"Distributed Training with {self.world_size} GPUs")
     else:
-    logging.info("Single node training.")
+      logging.info("Single GPU training.")
 
 
     if not self.is_distributed:
@@ -213,7 +213,7 @@ class Trainer:
     self._save_ckpt(global_step, epoch_id, final=True)
     logging.info("Done training -- epoch limit reached.")
     if self.is_distributed:
-    torch.distributed.destroy_process_group()
+      torch.distributed.destroy_process_group()
 
 
   def _print_approximated_train_time(self, start_time):
@@ -283,4 +283,3 @@ class Trainer:
       self.message.add("PSNR", psnr, format=".4f")
       self.message.add("imgs/sec", examples_per_second, width=5, format=".0f")
       logging.info(self.message.get_message())
-
