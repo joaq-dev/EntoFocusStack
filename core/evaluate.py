@@ -270,4 +270,3 @@ class Evaluator:
       final_image = self.eval_classic_models()
     else:
       final_image = self.eval_model()
-
