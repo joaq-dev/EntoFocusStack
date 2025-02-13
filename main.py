@@ -13,8 +13,8 @@ from core.utils import Config
 
 def main(config):
         # Add GPU selection logic to choose GPUs locally
-    if config.cluster.gpus_to_use:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, config.cluster.gpus_to_use))
+    #if config.cluster.gpus_to_use:
+        #os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, config.cluster.gpus_to_use))
 
     if config.project.mode == 'train':
         from core.trainer import Trainer
@@ -51,7 +51,7 @@ if __name__ == '__main__':
   # cluster settings
   parser_cluster = parser.add_argument_group("cluster", "Cluster configurations")
   parser_cluster.add_argument("--ngpus", type=int, default=2, help="Number of GPUs to use.")
-  parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 4], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 4].")
+  #parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 4], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 4].")
 
   # project settings
   parser_project = parser.add_argument_group("project", "Project parameters")
