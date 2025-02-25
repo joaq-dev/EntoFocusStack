@@ -142,7 +142,6 @@ def process_burst(burst_path, crop_size, device_id):
 
 
 if __name__ == '__main__':
-
     # Argument parser for GPU selection
     parser = argparse.ArgumentParser(description="Generate crops from images using multiple GPUs")
     parser.add_argument('--gpu_ids', type=str, default='0,4', help='Comma-separated list of GPU IDs (e.g., "0,1,2")')
@@ -150,18 +149,27 @@ if __name__ == '__main__':
 
     # Convert string input to list of integers
     gpu_ids = list(map(int, args.gpu_ids.split(',')))
+
+    # Ensure valid GPU IDs
+    available_gpus = list(range(torch.cuda.device_count()))
+    gpu_ids = [gpu for gpu in gpu_ids if gpu in available_gpus]
+
+    assert len(gpu_ids) > 0, "No valid GPUs found! Check --gpu_ids input."
+
     num_gpus = len(gpu_ids)
     crop_size = 128
+
     for split in ['train', 'test']:
         df = pd.read_csv('dataset.csv', sep=";")
         df = df[df['set'] == split][['lens', 'photo']]
         bursts_list = df.apply(lambda x: join(split, x[0], x[1]), axis=1).values
         bursts_list = list(bursts_list)
 
-        # Distribute the bursts among the GPUs
-        burst_chunks = [bursts_list[i::num_gpus] for i in range(num_gpus)]
+        # **Improved burst distribution using contiguous chunks**
+        burst_chunks = np.array_split(bursts_list, num_gpus)
 
-        processes = []
         for device_id, burst_paths in zip(gpu_ids, burst_chunks):
+            burst_paths = list(burst_paths)  # Convert NumPy array to list
             for burst_path in burst_paths:
+                print(f"Processing {burst_path} on GPU {device_id}")
                 process_burst(burst_path, crop_size, device_id)
