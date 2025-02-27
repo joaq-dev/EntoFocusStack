@@ -24,7 +24,7 @@ from torch.optim import lr_scheduler
 from torch.nn.parallel import DistributedDataParallel
 from torch.distributed.elastic.multiprocessing.errors import record
 from torch.cuda.amp import autocast, GradScaler
-import wandb
+
 
 
 class Trainer:
@@ -88,12 +88,7 @@ class Trainer:
     self.num_tasks = int(os.environ.get("WORLD_SIZE", 1))
     self.is_master = (self.rank == 0)
     
-    if self.is_master:  # Only log on the main process
-      wandb.init(
-        project="FocusStackingDL",
-        name=self.config.project.train_dir,
-        config=self.config.to_dict()
-        )
+    
     # Setup logging
     utils.setup_logging(self.config.project, self.rank)
 
@@ -291,14 +286,4 @@ class Trainer:
       self.message.add("imgs/sec", examples_per_second, width=5, format=".0f")
       logging.info(self.message.get_message())
       
-    if self.is_master:
-      wandb.log({
-        "Epoch": epoch,
-        "Step": step,
-        "L1Loss": loss.item(),
-        "PSNR": psnr.item(),
-        "LR": self.optimizer.param_groups[0]['lr'],
-      })
-      
-    if self.is_master:
-      wandb.finish()
+
