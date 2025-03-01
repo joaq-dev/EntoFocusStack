@@ -69,9 +69,7 @@ class Trainer:
       }
       logging.debug("Saving checkpoint '{}'.".format(ckpt_name))
       torch.save(state, ckpt_path)
-      if self.is_master:
-        wandb.save(ckpt_path)  # Uploads to wandb
-
+      
   @record
   def __call__(self):
     """Performs training and evaluation
