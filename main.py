@@ -50,7 +50,7 @@ if __name__ == '__main__':
   
   # cluster settings
   parser_cluster = parser.add_argument_group("cluster", "Cluster configurations")
-  parser_cluster.add_argument("--ngpus", type=int, default=2, help="Number of GPUs to use.")
+  parser_cluster.add_argument("--ngpus", type=int, default=1, help="Number of GPUs to use.")
   #parser_cluster.add_argument("--gpus_to_use", type=int, nargs='+', default=[0, 4], help="List of GPUs to use (e.g., 0 1 4 for GPUs 0, 1, and 4). Default is [0, 4].")
 
   # project settings
@@ -88,7 +88,7 @@ if __name__ == '__main__':
                                help="Clip the norm of the gradient during training.")
   parser_training.add_argument("--gradient_clip_by_value", type=float, default=None,
                                help="Clip the gradient by value during training.")
-  parser_training.add_argument("--batch_size", type=int, default=8,
+  parser_training.add_argument("--batch_size", type=int, default=32,
                                help="The batch size to use for training.")
   parser_training.add_argument("--frequency_log_steps", type=int, default=10,
                                help="Print log for every step.")
