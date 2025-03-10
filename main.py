@@ -148,7 +148,7 @@ if __name__ == '__main__':
                             help='number of residual groups')
   parser_archi.add_argument("--lrcn", type=eval, default=True,
                             help='use long-range concatenating network')
-  parser_archi.add_argument("--n_colors", type=int, default=1,
+  parser_archi.add_argument("--n_colors", type=int, default=3,
                             help='number of color channels to use')
   
   # parse all arguments and define config object
