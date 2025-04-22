@@ -69,8 +69,7 @@ class Trainer:
       }
       logging.debug("Saving checkpoint '{}'.".format(ckpt_name))
       torch.save(state, ckpt_path)
-
-
+      
   @record
   def __call__(self):
     """Performs training and evaluation
@@ -86,7 +85,8 @@ class Trainer:
     self.local_rank = int(os.environ.get("LOCAL_RANK", 0))
     self.num_tasks = int(os.environ.get("WORLD_SIZE", 1))
     self.is_master = (self.rank == 0)
-
+    
+    
     # Setup logging
     utils.setup_logging(self.config.project, self.rank)
 
@@ -283,3 +283,5 @@ class Trainer:
       self.message.add("PSNR", psnr, format=".4f")
       self.message.add("imgs/sec", examples_per_second, width=5, format=".0f")
       logging.info(self.message.get_message())
+      
+
